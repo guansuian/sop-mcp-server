@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "abnormal-report-mcp": {
+      "command": "node",
+      "args": [
+        "D:\\将一个mcp 拆成四个\\abnormal-report-mcp\\dist\\src\\index.js"
+      ],
+      "env": {
+        "MES_CONFIG_PATH": "D:\\将一个mcp 拆成四个\\abnormal-report-mcp\\config\\mes-config.json"
+      }
+    }
+  }
+}

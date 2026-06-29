@@ -10,7 +10,7 @@ test("tool registry only exposes existing abnormal report tool", () => {
 
 test("mes config only enables existing tools", () => {
     const config = JSON.parse(
-        readFileSync("src/config/mes-config.json", "utf-8"),
+        readFileSync("config/mes-config.json", "utf-8"),
     ) as { tools?: Record<string, boolean> };
 
     assert.deepEqual(Object.keys(config.tools ?? {}), allToolNames);

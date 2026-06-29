@@ -1,6 +1,6 @@
 {
   "mes": {
-    "baseUrl": "http://localhost:9998",
+    "baseUrl": "http://123.60.102.125:9111/industry",
     "auth": {
       "type": "login",
       "username": "superadmin",

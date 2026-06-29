@@ -2,6 +2,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 import { MesClient } from "./services/mesClient.js";
+
+import { serverInstructions } from "./instructions/serverInstructions.js";
 import { getEnabledTools} from "./tools/index.js";
 import { logger } from "./utils/logger.js";
 
@@ -88,6 +90,9 @@ async function main(): Promise<void> {
         {
           name: "andon_sop-mcp",
           version: "1.0.0",
+        },
+        {
+          instructions: serverInstructions,
         }
     );
 
@@ -113,8 +118,6 @@ async function main(): Promise<void> {
     logger.info(
         `Registered ${tools.length} tools: ${tools.map((t) => t.name).join(", ")}`
     );
-
-    // 通过 stdio 传输连接
     const transport = new StdioServerTransport();
     await server.connect(transport);
 

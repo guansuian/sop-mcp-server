@@ -5,7 +5,7 @@
  * self-contained ESM file that can run on any machine with Node.js >= 18.
  *
  * Usage: node scripts/bundle.mjs
- * Output: andon_sop-mcp.mjs (project root)
+ * Output: abnormal-report-mcp.mjs (project root)
  */
 
 import * as esbuild from "esbuild";
@@ -17,7 +17,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 
 async function bundle() {
-    console.log("Bundling andon_sop-mcp...");
+    console.log("Bundling abnormal-report-mcp...");
 
     const result = await esbuild.build({
         entryPoints: [resolve(root, "src", "index.ts")],
@@ -25,7 +25,7 @@ async function bundle() {
         platform: "node",
         target: "node18",
         format: "esm",
-        outfile: resolve(root, "andon_sop-mcp.mjs"),
+        outfile: resolve(root, "abnormal-report-mcp.mjs"),
         // Bundle everything — no externals
         external: [],
         // Keep readable for debugging (not minified)
@@ -54,9 +54,9 @@ const require = createRequire(import.meta.url);
     }
 
     // Print output size
-    const stats = readFileSync(resolve(root, "andon_sop-mcp.mjs"), "utf-8");
+    const stats = readFileSync(resolve(root, "abnormal-report-mcp.mjs"), "utf-8");
     const sizeKB = (Buffer.byteLength(stats, "utf-8") / 1024).toFixed(1);
-    console.log(`Bundle complete: andon_sop-mcp.mjs (${sizeKB} KB)`);
+    console.log(`Bundle complete: abnormal-report-mcp.mjs (${sizeKB} KB)`);
 }
 
 bundle().catch((err) => {

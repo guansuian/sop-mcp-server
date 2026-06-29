@@ -1,0 +1,28 @@
+{
+  "name": "my-mcp-server",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "build": "tsc",
+    "bundle": "node scripts/bundle.mjs",
+    "test": "npm run build && node --test dist/test",
+    "start": "node dist/src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "axios": "^1.18.0",
+    "qs": "^6.15.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "@types/qs": "^6.15.1",
+    "esbuild": "^0.27.2",
+    "typescript": "^6.0.3"
+  }
+}

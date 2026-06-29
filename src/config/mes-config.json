@@ -1,0 +1,19 @@
+{
+  "mes": {
+    "baseUrl": "http://localhost:9998",
+    "auth": {
+      "type": "login",
+      "username": "superadmin",
+      "password": "1234554321",
+      "loginUrl": "/main/login",
+      "contentType": "application/x-www-form-urlencoded"
+    },
+    "timeout": 300000,
+    "queryTimeoutMs": 25000,
+    "retry": 3,
+    "writeIntervalMs": 2400
+  },
+  "tools": {
+    "queryAbnormalReportPage": true
+  }
+}

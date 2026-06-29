@@ -1,0 +1,21 @@
+{
+  "mes": {
+    "baseUrl": "http://your-mes-server:8081",
+    "auth": {
+      "type": "login",
+      "username": "your-username",
+      "password": "your-password",
+      "loginUrl": "/main/login"
+    },
+    "timeout": 10000,
+    "retry": 3
+  },
+  "tools": {
+    "likeSelectMaterielList": true,
+    "selectCategoryTreeList": true,
+    "saveCategory": true,
+    "uploadSop": true,
+    "queryAbnormalReportPage": true,
+    "selectReportFrom": true
+  }
+}

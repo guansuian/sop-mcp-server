@@ -10,7 +10,7 @@ const REPORT_CLASS_NAME = "AndonAbnormalReport";
 const REPORT_ENDPOINT = "/andonAbnormalReport";
 
 export const description =
-    "查询 MES 异常报表/安灯异常记录时使用本工具；当用户明确想查看异常报表、异常记录、异常统计、异常处理历史时，应调用本工具。用户提出制造现场、生产现场、工位、设备、质量、物料、节拍等问题或异常，并希望查找原因、处理结果、历史解决方案、处置经验时，也应先调用本工具查询 AndonAbnormalReport 历史异常记录，再从查询结果中的异常详情、处理结果、处理人、持续时长等字段中总结可参考的解决方案。工具会先读取 AndonAbnormalReport 表单字段配置，构建动态查询参数，查询分页数据，并使用数据字典翻译展示值。";
+    "调用工具前，应先读取 MCP resource: mcp://abnormal-report-mcp/instructions/serverInstructions。该 resource 描述了安灯系统 MCP 的能力、查询流程和输出要求；如果 resources/list 为空，也可以直接用 resources/read 读取该 URI。查询 MES 异常报表/安灯异常记录时使用本工具；当用户明确想查看异常报表、异常记录、异常统计、异常处理历史时，应调用本工具。用户提出制造现场、生产现场、工位、设备、质量、物料、节拍等问题或异常，并希望查找原因、处理结果、历史解决方案、处置经验时，也应先调用本工具查询 AndonAbnormalReport 历史异常记录，再从查询结果中的异常详情、处理结果、处理人、持续时长等字段中总结可参考的解决方案。工具会先读取 AndonAbnormalReport 表单字段配置，构建动态查询参数，查询分页数据，并使用数据字典翻译展示值。";
 
 export const inputSchema = z.object({
     page: z.number().int().min(1).default(1).describe("页码，从 1 开始。默认 1。"),

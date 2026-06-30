@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "abnormal-report-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "安装路径\\abnormal-report-mcp.mjs"
+      ],
+      "env": {
+        "MES_CONFIG_PATH": "安装路径\\config\\mes-config.json"
+      }
+    }
+  }
+}

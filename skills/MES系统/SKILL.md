@@ -1,38 +1,27 @@
 ---
-name: mes-system
-description: 当需要通过 andon-sop-mcp 操作 MES 系统时使用，包括 SOP 上传、SOP 下发、异常报表查询与 HTML 可视化报表生成、异常图纸预览、项目管理、项目任务管理、生产任务下达或反下达，以及任何需要从查询结果中获取真实 MES id 的流程。
+name: abnormal-report-system
+description: Use when querying abnormal-report-mcp for Andon abnormal records, abnormal status, handling results, handling progress, abnormal causes, or historical Andon handling experience.
 ---
 
-# MES 系统
+# 安灯系统异常报告 MCP
 
 ## 核心规则
 
-所有写入类操作之前，都必须先查询真实 MES 数据。不要凭空构造 id、名称、状态、客户、用户、工位、物料、项目、任务或文件。
+这个 skill 只适用于 `abnormal-report-mcp`。当前 MCP 只提供安灯系统异常报告查询能力。
 
-新增、修改、删除、上传、下发、下达、反下达这类流程必须遵守：
+当用户询问安灯系统中的异常、状态、处理结果、处理进度、关闭情况、异常原因或历史处理经验时，必须调用 `queryAbnormalReportPage` 查询 `AndonAbnormalReport` 记录后再回答。
 
-1. 先调用查询工具获取候选数据。
-2. 如果存在多个候选项，先让用户选择目标记录。
-3. 使用 Work Buddy 查询上下文中的 `id` 和相关字段构造后续工具参数。
-4. 调用写入工具之前，先检查状态限制。
-
-动态查询工具通常会返回两部分内容：
-
-- Markdown 表格：给用户快速阅读。
-- Work Buddy 查询上下文 JSON：给 AI 获取记录 `id`、可查询字段、字典映射和后续参数。
+不要凭常识编造安灯异常数据、状态、处理结果、处理人、处理时间或关闭情况。查询结果不足时，明确说明缺少哪些条件或记录。
 
 ## 参考文档
 
-处理具体模块前，读取对应参考文档：
+处理安灯异常报告查询时，只读取：
 
-- SOP 上传、SOP 列表、下发到工位机、异常图纸预览：`references/sop.md`
-- 异常报表动态字段查询、HTML 可视化报表生成：`references/abnormal-report.md`
-- 项目、客户、用户、项目任务：`references/project.md`
-- 生产任务查询、下达、反下达：`references/production-task.md`
+- `references/abnormal-report.md`
 
-## 通用查询规则
+## 查询规则
 
-大多数分页查询工具支持：
+`queryAbnormalReportPage` 支持：
 
 - `page`
 - `limit`
@@ -42,19 +31,25 @@ description: 当需要通过 andon-sop-mcp 操作 MES 系统时使用，包括 S
 
 构造 `filters` 时：
 
-- key 使用工具返回的 searchable fields 中的 `field`。
-- 不要用中文标题作为 key。
-- 文本字段支持模糊查询。
-- 日期时间字段支持范围查询，格式为 `{ "start": "...", "end": "..." }`。
-- select 字段筛选时优先使用字典 value，不要直接使用 label。
+- key 使用 `AndonAbnormalReport` 的字段名，不要使用中文标题作为 key。
+- 文本字段可用于模糊查询。
+- 日期时间字段使用 `{ "start": "...", "end": "..." }` 表示范围。
+- 状态、处理结果等枚举字段优先使用系统字段值；不确定字段值时先放宽条件查询。
+- 用户没有指定分页时，默认 `page=1`、`limit=5`。
+- 条件不充分时，先用已知条件查询；不要虚构字段或值。
 
-## 不能跳过的检查
+## 输出要求
 
-- 上传 SOP 前，必须先查询分类 id 和物料 id。
-- 下发 SOP 前，必须先查询 SOP 记录 id 和工位机 `stationId/stationName`。
-- 预览异常图纸前，必须先从异常图纸查询结果中获取附件 id。
-- 查询异常报表后，首次应生成 HTML 可视化报表并给出文件链接；后续默认不重复生成，除非用户明确要求。
-- 修改或删除项目数据前，必须先查询目标项目。
-- 新增或修改项目任务前，必须先查询项目和责任人。
-- 生产任务下达或反下达前，必须检查每条被选中记录的 `checkStatus`。
+回答应基于 `queryAbnormalReportPage` 的返回结果，并尽量包含：
 
+1. 结论
+2. 查询条件
+3. 关键异常记录
+4. 异常状态或处理结果
+5. 后续建议
+
+如果没有查到匹配记录：
+
+- 说明没有匹配结果。
+- 不要编造异常原因或处理结果。
+- 建议用户补充工位、设备、产线、物料、人员、时间范围或异常关键词等查询条件。

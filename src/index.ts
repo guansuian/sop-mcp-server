@@ -4,6 +4,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { MesClient } from "./services/mesClient.js";
 
 import { serverInstructions } from "./instructions/serverInstructions.js";
+import { registerResources } from "./resources/index.js";
 import { getEnabledTools} from "./tools/index.js";
 import { logger } from "./utils/logger.js";
 
@@ -88,7 +89,7 @@ async function main(): Promise<void> {
     // 创建 MCP Server
     const server = new McpServer(
         {
-          name: "andon_sop-mcp",
+          name: "abnormal-report-mcp",
           version: "1.0.0",
         },
         {
@@ -118,6 +119,8 @@ async function main(): Promise<void> {
     logger.info(
         `Registered ${tools.length} tools: ${tools.map((t) => t.name).join(", ")}`
     );
+    registerResources(server);
+    logger.info("Registered resources: serverInstructions");
     const transport = new StdioServerTransport();
     await server.connect(transport);
 

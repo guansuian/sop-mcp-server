@@ -4,7 +4,10 @@ import test from "node:test";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 
-test("exposes the abnormal report MCP tool", async () => {
+function createTestClient(): {
+  client: Client;
+  transport: StdioClientTransport;
+} {
   const client = new Client({
     name: "hello-world-test-client",
     version: "1.0.0",
@@ -15,6 +18,12 @@ test("exposes the abnormal report MCP tool", async () => {
     cwd: process.cwd(),
     stderr: "pipe",
   });
+
+  return { client, transport };
+}
+
+test("exposes the abnormal report MCP tool", async () => {
+  const { client, transport } = createTestClient();
   let serverLogs = "";
   transport.stderr?.on("data", (chunk: Buffer) => {
     serverLogs += chunk.toString();
@@ -32,6 +41,11 @@ test("exposes the abnormal report MCP tool", async () => {
     const abnormalReportTool = tools.tools[0];
     assert.ok(abnormalReportTool);
     assert.equal(abnormalReportTool.name, "queryAbnormalReportPage");
+    assert.match(
+      abnormalReportTool.description ?? "",
+      /mcp:\/\/abnormal-report-mcp\/instructions\/serverInstructions/,
+    );
+    assert.match(abnormalReportTool.description ?? "", /调用工具前/);
 
     await new Promise<void>((resolve) => setImmediate(resolve));
     assert.match(serverLogs, /MCP Server starting/);
@@ -41,16 +55,7 @@ test("exposes the abnormal report MCP tool", async () => {
 });
 
 test("publishes andon system workflow instructions during initialization", async () => {
-  const client = new Client({
-    name: "hello-world-test-client",
-    version: "1.0.0",
-  });
-  const transport = new StdioClientTransport({
-    command: process.execPath,
-    args: ["dist/src/index.js"],
-    cwd: process.cwd(),
-    stderr: "pipe",
-  });
+  const { client, transport } = createTestClient();
 
   try {
     await client.connect(transport);
@@ -61,50 +66,53 @@ test("publishes andon system workflow instructions during initialization", async
     assert.match(instructions, /总体流程/);
     assert.match(instructions, /queryAbnormalReportPage/);
     assert.match(instructions, /异常、状态、处理结果/);
+    assert.match(
+      instructions,
+      /mcp:\/\/abnormal-report-mcp\/instructions\/serverInstructions/,
+    );
+    assert.match(instructions, /resources\/read/);
   } finally {
     await client.close();
   }
 });
 
-test("exposes the abnormal report MCP prompt", async () => {
-  const client = new Client({
-    name: "hello-world-test-client",
-    version: "1.0.0",
-  });
-  const transport = new StdioClientTransport({
-    command: process.execPath,
-    args: ["dist/src/index.js"],
-    cwd: process.cwd(),
-    stderr: "pipe",
-  });
+test("exposes and reads the server instructions resource", async () => {
+  const { client, transport } = createTestClient();
 
   try {
     await client.connect(transport);
 
-    const prompts = await client.listPrompts();
-    assert.deepEqual(
-      prompts.prompts.map((prompt) => prompt.name),
-      ["abnormalReportAssistant"],
+    const resources = await client.listResources();
+    const resource = resources.resources.find(
+      (item) =>
+        item.uri === "mcp://abnormal-report-mcp/instructions/serverInstructions",
     );
 
-    const prompt = await client.getPrompt({
-      name: "abnormalReportAssistant",
+    assert.ok(resource);
+    assert.equal(resource.name, "serverInstructions");
+    assert.match(resource.description ?? "", /Work Buddy/);
+    assert.match(resource.description ?? "", /调用任何工具前应先读取/);
+    assert.match(
+      resource.description ?? "",
+      /mcp:\/\/abnormal-report-mcp\/instructions\/serverInstructions/,
+    );
+    assert.match(resource.description ?? "", /queryAbnormalReportPage/);
+
+    const content = await client.readResource({
+      uri: resource.uri,
     });
 
-    assert.equal(prompt.messages.length, 1);
-    assert.equal(prompt.messages[0].role, "user");
-    assert.equal(prompt.messages[0].content.type, "text");
+    assert.equal(content.contents.length, 1);
+    const [item] = content.contents;
+    assert.equal(item.uri, resource.uri);
+    assert.equal(item.mimeType, "text/plain");
+    assert.ok("text" in item);
+    assert.match(item.text, /安灯系统/);
+    assert.match(item.text, /总体流程/);
+    assert.match(item.text, /queryAbnormalReportPage/);
     assert.match(
-      prompt.messages[0].content.text,
-      /安灯系统/,
-    );
-    assert.match(
-      prompt.messages[0].content.text,
-      /异常、状态、处理结果/,
-    );
-    assert.match(
-      prompt.messages[0].content.text,
-      /queryAbnormalReportPage/,
+      item.text,
+      /mcp:\/\/abnormal-report-mcp\/instructions\/serverInstructions/,
     );
   } finally {
     await client.close();
